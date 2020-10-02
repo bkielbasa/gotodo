@@ -3,6 +3,7 @@ package repositories
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 
 	"github.com/bkielbasa/gotodo/httpmodels"
 )
@@ -27,8 +28,8 @@ func NewPostgres(db *sql.DB) Postgres {
 }
 
 func (p Postgres) AddToDo(name string) (string, error) {
-	q := `INSERT INTO todos ("name") VALUES ($1) returning id`
-	resp, err := p.db.Query(q, name)
+	q := fmt.Sprintf(`INSERT INTO todos ("name") VALUES ('%s') returning id`, name)
+	resp, err := p.db.Query(q)
 
 	if err != nil {
 		return "", err
@@ -46,8 +47,8 @@ func (p Postgres) AddToDo(name string) (string, error) {
 }
 
 func (p Postgres) GetToDo(id string) (string, bool, error) {
-	q := `SELECT "name", done FROM todos where id = $1`
-	row := p.db.QueryRow(q, id)
+	q := fmt.Sprintf(`SELECT "name", done FROM todos where id = '%s'`, id)
+	row := p.db.QueryRow(q)
 
 	var name string
 	var done bool
@@ -57,14 +58,14 @@ func (p Postgres) GetToDo(id string) (string, bool, error) {
 }
 
 func (p Postgres) MarkToDoAsDone(id string) error {
-	q := `UPDATE todos SET done = true where id = $1`
+	q := fmt.Sprintf(`UPDATE todos SET done = true where id = '%s'`, id)
 	res, err := p.db.Exec(q, id)
 
 	if err != nil {
 		return err
 	}
 
-	if c, _ :=res.RowsAffected(); c != 1 {
+	if c, _ := res.RowsAffected(); c != 1 {
 		return errors.New("the to do does not exist")
 	}
 
@@ -72,14 +73,14 @@ func (p Postgres) MarkToDoAsDone(id string) error {
 }
 
 func (p Postgres) MarkToDoAsUndone(id string) error {
-	q := `UPDATE todos SET done = false where id = $1`
+	q := fmt.Sprintf(`UPDATE todos SET done = false where id = '%s'`, id)
 	res, err := p.db.Exec(q, id)
 
 	if err != nil {
 		return err
 	}
 
-	if c, _ :=res.RowsAffected(); c != 1 {
+	if c, _ := res.RowsAffected(); c != 1 {
 		return errors.New("the to do does not exist")
 	}
 
@@ -110,7 +111,7 @@ func (p Postgres) ListToDos() (httpmodels.ListToDoResponse, error) {
 }
 
 func (p Postgres) CreateProject(name string) (string, error) {
-	q := `INSERT INTO project ("name") VALUES ($1) returning id`
+	q := fmt.Sprintf(`INSERT INTO project ("name") VALUES ('%s') returning id`, name)
 	resp, err := p.db.Query(q, name)
 
 	if err != nil {
@@ -152,14 +153,14 @@ func (p Postgres) ListProjects() (httpmodels.ListProjectsResponse, error) {
 }
 
 func (p Postgres) ArchiveProject(id string) error {
-	q := `UPDATE project SET archived = true where id = $1`
-	res, err := p.db.Exec(q, id)
+	q := fmt.Sprintf(`UPDATE project SET archived = true where id = '%s'`, id)
+	res, err := p.db.Exec(q)
 
 	if err != nil {
 		return err
 	}
 
-	if c, _ :=res.RowsAffected(); c != 1 {
+	if c, _ := res.RowsAffected(); c != 1 {
 		return errors.New("the project does not exist")
 	}
 

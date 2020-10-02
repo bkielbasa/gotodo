@@ -1,3 +1,5 @@
+create extension "uuid-ossp";
+
 CREATE TABLE public.todos (
     id uuid NOT NULL DEFAULT uuid_generate_v4(),
     "name" varchar NOT NULL,

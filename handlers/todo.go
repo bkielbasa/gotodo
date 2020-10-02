@@ -37,12 +37,6 @@ func (t ToDo) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if req.ProjectID == "" {
-		log.Printf("the project_id is required")
-		http.Error(w, "the project_id is required", http.StatusBadRequest)
-		return
-	}
-
 	id, err := t.Repo.AddToDo(req.Name)
 	if err != nil {
 		log.Printf("internal server error: %s", err)
@@ -55,7 +49,7 @@ func (t ToDo) Create(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Add("content-type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	_,_ = w.Write(b)
+	_, _ = w.Write(b)
 }
 
 func (t ToDo) List(w http.ResponseWriter, r *http.Request) {
@@ -70,7 +64,7 @@ func (t ToDo) List(w http.ResponseWriter, r *http.Request) {
 	b, _ := json.Marshal(resp)
 
 	w.Header().Add("content-type", "application/json")
-	_,_ = w.Write(b)
+	_, _ = w.Write(b)
 }
 
 func (t ToDo) Get(w http.ResponseWriter, r *http.Request) {
@@ -93,7 +87,7 @@ func (t ToDo) Get(w http.ResponseWriter, r *http.Request) {
 	b, _ := json.Marshal(resp)
 	w.Header().Add("content-type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	_,_ = w.Write(b)
+	_, _ = w.Write(b)
 }
 
 func (t ToDo) MarkAsDone(w http.ResponseWriter, r *http.Request) {
