@@ -40,7 +40,7 @@ func (p Project) Create(w http.ResponseWriter, r *http.Request) {
 	id, err := p.Repo.CreateProject(req.Name)
 	if err != nil {
 		log.Printf("internal server error: %s", err)
-		http.Error(w, "internal server error", http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -49,7 +49,7 @@ func (p Project) Create(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Add("content-type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	_,_ = w.Write(b)
+	_, _ = w.Write(b)
 }
 
 func (p Project) List(w http.ResponseWriter, r *http.Request) {
@@ -64,7 +64,7 @@ func (p Project) List(w http.ResponseWriter, r *http.Request) {
 	b, _ := json.Marshal(resp)
 
 	w.Header().Add("content-type", "application/json")
-	_,_ = w.Write(b)
+	_, _ = w.Write(b)
 }
 
 func (p Project) Archive(w http.ResponseWriter, r *http.Request) {
