@@ -111,7 +111,7 @@ func (p Postgres) ListToDos() (httpmodels.ListToDoResponse, error) {
 }
 
 func (p Postgres) CreateProject(name string) (string, error) {
-	q := fmt.Sprintf(`INSERT INTO project ("name") VALUES ('%s') returning id`, name)
+	q := `INSERT INTO project ("name") VALUES ($1) returning id`
 	resp, err := p.db.Query(q, name)
 
 	if err != nil {
