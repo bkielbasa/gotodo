@@ -43,6 +43,7 @@ func TestAddingNewProject(t *testing.T) {
 	// create a new project
 	resp, err := client.Post(url, "application/json", strings.NewReader(reqBody))
 	require.NoError(t, err)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
 
 	respBody, err := ioutil.ReadAll(resp.Body)
 	require.NoError(t, err)
