@@ -14,7 +14,7 @@ type Postgres struct {
 
 type PostgresRepository interface {
 	GetToDo(id string) (string, bool, error)
-	AddToDo(name string) (string, error)
+	AddToDo(projectID, name string) (string, error)
 	MarkToDoAsDone(id string) error
 	MarkToDoAsUndone(id string) error
 	ListToDos() (httpmodels.ListToDoResponse, error)
@@ -27,8 +27,8 @@ func NewPostgres(db *sql.DB) Postgres {
 	return Postgres{db}
 }
 
-func (p Postgres) AddToDo(name string) (string, error) {
-	q := fmt.Sprintf(`INSERT INTO todos ("name") VALUES ('%s') returning id`, name)
+func (p Postgres) AddToDo(projectID, name string) (string, error) {
+	q := fmt.Sprintf(`INSERT INTO todos ("name", project_id) VALUES ('%s', '%s') returning id`, name, projectID)
 	resp, err := p.db.Query(q)
 
 	if err != nil {

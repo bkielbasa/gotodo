@@ -25,11 +25,11 @@ type projectsListResponse struct {
 	Projects []projectDetail
 }
 
-const port = 8080
+const port = 8090
 
 func TestAddingNewProject(t *testing.T) {
 	ctx := context.Background()
-	run, shutdown := todo.App(ctx, 8090)
+	run, shutdown := todo.App(ctx, port)
 	defer shutdown()
 
 	go run()

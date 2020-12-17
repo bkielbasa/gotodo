@@ -37,14 +37,20 @@ func (t ToDo) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := t.Repo.AddToDo(req.Name)
+	if req.ProjectID == "" {
+		log.Printf("the ProjectID is required")
+		http.Error(w, "the ProjectID is required", http.StatusBadRequest)
+		return
+	}
+
+	id, err := t.Repo.AddToDo(req.ProjectID, req.Name)
 	if err != nil {
 		log.Printf("internal server error: %s", err)
 		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
 
-	resp := httpmodels.CreateToDoResponse{id}
+	resp := httpmodels.CreateToDoResponse{ID: id}
 	b, _ = json.Marshal(resp)
 
 	w.Header().Add("content-type", "application/json")
