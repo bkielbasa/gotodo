@@ -3,16 +3,17 @@ package app
 import (
 	"context"
 	"errors"
+	"testing"
+
 	"github.com/bkielbasa/gotodo/domain"
 	"github.com/google/uuid"
-	"testing"
 )
 
 func TestAddNewProject(t *testing.T) {
 	name := "my name:" + uuid.New().String()
 	ctx := context.Background()
 
-	projectServ := NewProjectService(newStoreMock())
+	projectServ := NewProjectService(newRepoMock())
 	p, err := projectServ.Add(ctx, name)
 	if err != nil {
 		t.Errorf("expected no error but got: %s", err)
@@ -30,21 +31,21 @@ func TestAddNewProject(t *testing.T) {
 }
 
 func checkProjectID(t *testing.T, p domain.Project, expectedID string) {
-	if p.ID() !=  expectedID {
-		t.Errorf("expected ID %s but %s given", expectedID,  p.ID())
+	if p.ID() != expectedID {
+		t.Errorf("expected ID %s but %s given", expectedID, p.ID())
 	}
 }
 
 func checkProjectName(t *testing.T, p domain.Project, expectedName string) {
-	if p.Name() !=  expectedName {
-		t.Errorf("expected name %s but %s given", expectedName,  p.Name())
+	if p.Name() != expectedName {
+		t.Errorf("expected name %s but %s given", expectedName, p.Name())
 	}
 }
 
 func TestEveryProjectShouldHaveUniqueID(t *testing.T) {
 	name := "a name"
 
-	projectServ := NewProjectService(newStoreMock())
+	projectServ := NewProjectService(newRepoMock())
 	p1, err := projectServ.Add(context.Background(), name)
 	if err != nil {
 		t.Errorf("expected no error but got: %s", err)
@@ -63,7 +64,7 @@ func TestEveryProjectShouldHaveUniqueID(t *testing.T) {
 func TestAddNewProjectWithEmptyName(t *testing.T) {
 	name := ""
 
-	projectServ := NewProjectService(newStoreMock())
+	projectServ := NewProjectService(newRepoMock())
 	_, err := projectServ.Add(context.Background(), name)
 	if err == nil {
 		t.Errorf("expected error but got nil")
@@ -73,7 +74,7 @@ func TestAddNewProjectWithEmptyName(t *testing.T) {
 func TestAGetNotExistingProject(t *testing.T) {
 	id := "not exists"
 	ctx := context.Background()
-	storage := newStoreMock().withError(ErrProjectNotFound)
+	storage := newRepoMock().withError(ErrProjectNotFound)
 
 	projectServ := NewProjectService(storage)
 
@@ -83,28 +84,27 @@ func TestAGetNotExistingProject(t *testing.T) {
 	}
 }
 
-type storeMock struct {
+type repoMock struct {
 	data map[string]domain.Project
-	err error
+	err  error
 }
 
-func newStoreMock() *storeMock {
-	return &storeMock{
+func newRepoMock() *repoMock {
+	return &repoMock{
 		data: make(map[string]domain.Project),
 	}
 }
 
-func (s *storeMock) Store(ctx context.Context, p domain.Project) error {
+func (s *repoMock) Store(ctx context.Context, p domain.Project) error {
 	s.data[p.ID()] = p
 	return nil
 }
 
-func (s *storeMock) Get(ctx context.Context, id string) (domain.Project, error) {
+func (s *repoMock) Get(ctx context.Context, id string) (domain.Project, error) {
 	return s.data[id], s.err
 }
 
-func (s *storeMock) withError(err error) *storeMock {
+func (s *repoMock) withError(err error) *repoMock {
 	s.err = err
 	return s
 }
-
