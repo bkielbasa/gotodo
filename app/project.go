@@ -10,14 +10,14 @@ import (
 var ErrProjectNotFound = errors.New("the project is not found")
 
 type ProjectService struct {
-	storage Storage
+	repo Repository
 }
 
-func NewProjectService(storage Storage) ProjectService {
-	return ProjectService{storage: storage}
+func NewProjectService(storage Repository) ProjectService {
+	return ProjectService{repo: storage}
 }
 
-type Storage interface {
+type Repository interface {
 	Store(ctx context.Context, p domain.Project) error
 	Get(ctx context.Context, id string) (domain.Project, error)
 }
@@ -29,7 +29,7 @@ func (serv ProjectService) Add(ctx context.Context, name string) (domain.Project
 		return domain.Project{}, err
 	}
 
-	err = serv.storage.Store(ctx, p)
+	err = serv.repo.Store(ctx, p)
 	if err != nil {
 		return domain.Project{}, err
 	}
@@ -38,5 +38,5 @@ func (serv ProjectService) Add(ctx context.Context, name string) (domain.Project
 }
 
 func (serv ProjectService) Get(ctx context.Context, id string) (domain.Project, error) {
-	return serv.storage.Get(ctx, id)
+	return serv.repo.Get(ctx, id)
 }
